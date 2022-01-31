@@ -20,6 +20,7 @@ namespace Octopus_OffPeak_Calc
             if (string.IsNullOrEmpty(url) || string.IsNullOrEmpty(apiKey))
             {
                 Console.WriteLine("Please ensure that consumption url and apiKey are valid");
+                return;
             }
 
             int durationInDays = 30;
