@@ -6,4 +6,4 @@ Octopus Off peak calculator analytics half hourly data provided by Octopus Energ
 
 1) Ensure you have dotnet 5 installed
 2) Download the WPF appliation binaries (https://github.com/hermitdave/Octopus-OffPeak-Calculator/files/7987068/Octopus-SmartData-WPF.zip)
-3) Extract and run Octopus-SmartData-WPF.exe[Octopus-SmartData-WPF.zip]
+3) Extract and run Octopus-SmartData-WPF.exe
