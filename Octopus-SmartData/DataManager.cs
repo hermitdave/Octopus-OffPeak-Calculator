@@ -70,6 +70,11 @@ namespace Octopus_SmartData
             
             while (continueProcessing)
             {
+                if (string.IsNullOrEmpty(url))
+                {
+                    break;
+                }
+                
                 var response = await client.GetFromJsonAsync<Consumption>(url);
 
                 if (response.results.Length == 0)
