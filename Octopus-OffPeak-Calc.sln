@@ -5,9 +5,14 @@ VisualStudioVersion = 17.1.32120.378
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Octopus-OffPeak-Calc", "Octopus-OffPeak-Calc\Octopus-OffPeak-Calc.csproj", "{05C18EC9-4A44-43AF-84FE-921B92B3E1DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Octopus-SmartData-WPF", "Octopus-SmartData-WPF\Octopus-SmartData-WPF.csproj", "{9B8E485C-BCAF-484B-B31C-A428412BCDDB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Octopus-SmartData-WPF", "Octopus-SmartData-WPF\Octopus-SmartData-WPF.csproj", "{9B8E485C-BCAF-484B-B31C-A428412BCDDB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Octopus-SmartData", "Octopus-SmartData\Octopus-SmartData.csproj", "{AC420F53-B8F7-4847-AC0E-C744EB8F2FC3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Octopus-SmartData", "Octopus-SmartData\Octopus-SmartData.csproj", "{AC420F53-B8F7-4847-AC0E-C744EB8F2FC3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E11297EB-E456-4A03-833A-95A7DCB236F7}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
