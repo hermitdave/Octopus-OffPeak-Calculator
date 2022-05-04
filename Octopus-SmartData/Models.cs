@@ -29,6 +29,14 @@ namespace Octopus_SmartData
         public double ForecastedTotalCost { get; set; }
         public double ForecastedAverageCost { get; set; }
 
+        public double AverageCostPerkWh
+        {
+            get
+            {
+                return TotalCost * 100 / TotalConsumption;
+            }
+        }
+
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
@@ -40,6 +48,7 @@ namespace Octopus_SmartData
             sb.AppendFormat("Average cost            : {0:0.00} GBP\n", AverageCost);
             sb.AppendFormat("Forecasted Total cost   : {0:0.00} GBP\n", ForecastedTotalCost);
             sb.AppendFormat("Forecasted Average cost : {0:0.00} GBP\n", ForecastedAverageCost);
+            sb.AppendFormat("Average rate per kWh    : {0:0.00} p\n", AverageCostPerkWh);
 
             return sb.ToString();
         }
