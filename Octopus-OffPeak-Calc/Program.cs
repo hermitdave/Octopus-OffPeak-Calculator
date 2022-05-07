@@ -15,8 +15,8 @@ namespace Octopus_OffPeak_Calc
     {
         static async Task Main(string[] args)
         {
-            string url = "";
-            string apiKey = "";
+            string url = "https://api.octopus.energy/v1/electricity-meter-points/1013040206969/meters/21L3824437/consumption/";
+            string apiKey = "sk_live_hHxfb4AG03X9SENp7oT8fWSy";
 
             if (string.IsNullOrEmpty(url) || string.IsNullOrEmpty(apiKey))
             {
@@ -26,14 +26,14 @@ namespace Octopus_OffPeak_Calc
 
             int durationInDays = 30;
 
-            var currentOffPeakRate = 0.05;
+            var currentOffPeakRate = 0.055;
             var currentPeakRate = 0.1412;
 
-            var newOffPeakRate = 0.075;
+            var newOffPeakRate = 0.08;
             var newPeakRate = 0.3083;
 
-            TimeSpan offPeakStart = new TimeSpan(0, 30, 0);
-            TimeSpan offPeakEnd = new TimeSpan(4, 30, 0);
+            TimeSpan offPeakStart = new TimeSpan(20, 30, 0);
+            TimeSpan offPeakEnd = new TimeSpan(1, 30, 0);
 
             var dataManager = new DataManager();
 
