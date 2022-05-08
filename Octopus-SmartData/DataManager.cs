@@ -12,14 +12,10 @@ namespace Octopus_SmartData
 {
     public class DataManager
     {
-        public async Task<List<ConsumptionInfo>> FetchUsageData(
-            string url, 
+        public async Task<List<DailyConsumption>> FetchDailyUsageData(
+            string url,
             string apiKey,
             int durationInDays,
-            double currentPeakRate, 
-            double currentOffPeakRate, 
-            double newPeakRate,
-            double newOffPeakRate,
             TimeSpan offPeakStart,
             TimeSpan offPeakEnd
             )
@@ -37,9 +33,9 @@ namespace Octopus_SmartData
             bool continueProcessing = true;
 
             List<TimeSpan> offPeakTimes = new List<TimeSpan>();
-            for(int i = 0; i < 24; i++)
+            for (int i = 0; i < 24; i++)
             {
-                for(int j = 0; j < 2; j++)
+                for (int j = 0; j < 2; j++)
                 {
                     var hour = i;
                     var minute = j * 30;
@@ -62,19 +58,17 @@ namespace Octopus_SmartData
                 }
             }
 
+            Dictionary<DateTime, DailyConsumption> dailyConsumption = new Dictionary<DateTime, DailyConsumption>();
+
             Dictionary<TimeSpan, double> usageDictionary = new Dictionary<TimeSpan, double>();
 
-            double totalUsage = 0;
-            double peakUsage = 0;
-            double offPeakUsage = 0;
-            
             while (continueProcessing)
             {
                 if (string.IsNullOrEmpty(url))
                 {
                     break;
                 }
-                
+
                 var response = await client.GetFromJsonAsync<Consumption>(url);
 
                 if (response.results.Length == 0)
@@ -89,28 +83,59 @@ namespace Octopus_SmartData
                         break;
                     }
 
+                    var date = entry.interval_start.Date;
                     var timeOfDay = entry.interval_start.TimeOfDay;
 
-                    if (!usageDictionary.ContainsKey(timeOfDay))
+                    if (!dailyConsumption.ContainsKey(date))
                     {
-                        usageDictionary[timeOfDay] = 0;
+                        dailyConsumption[date] = new DailyConsumption() { Date = date };
                     }
-                    usageDictionary[timeOfDay] += entry.consumption;
 
-                    totalUsage += entry.consumption;
+                    var consumption = dailyConsumption[date];
 
                     if (offPeakTimes.Contains(timeOfDay))
                     {
-                        offPeakUsage += entry.consumption;
+                        consumption.OffPeak += entry.consumption;
                     }
                     else
                     {
-                        peakUsage += entry.consumption;
+                        consumption.Peak += entry.consumption;
                     }
                 }
 
                 url = response.next;
             }
+
+            var list = dailyConsumption.Values.ToList();
+
+            list.OrderByDescending(x => x.Date.DayOfYear);
+
+            return list;
+        }
+
+        public List<ConsumptionInfo> FetchUsageData(
+            List<DailyConsumption> dailyConsumptions,
+            double currentPeakRate, 
+            double currentOffPeakRate, 
+            double newPeakRate,
+            double newOffPeakRate,
+            TimeSpan offPeakStart,
+            TimeSpan offPeakEnd
+            )
+        {
+            double totalUsage = 0;
+            double peakUsage = 0;
+            double offPeakUsage = 0;
+
+            foreach(var dailyConsumption in dailyConsumptions)
+            {
+                peakUsage += dailyConsumption.Peak;
+                offPeakUsage += dailyConsumption.OffPeak;
+            }
+
+            totalUsage = peakUsage + offPeakUsage;
+
+            var durationInDays = dailyConsumptions.Count;
 
             List<ConsumptionInfo> consumptions = new List<ConsumptionInfo>();
             

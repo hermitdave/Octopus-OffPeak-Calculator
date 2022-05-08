@@ -1,9 +1,164 @@
 ﻿@page "/"
+<h1>Hello, welcome to Octopus Energy Off Peak calculator. You will need API key and consumption url from Octopus account</h1>
 
-<h1>Hello, world!</h1>
+@using Octopus_SmartData
+@inject DataManager DataManager
 
-Welcome to your new app.
+<table width="80%">
+    <tr>
+        <td><label>API Key</label></td>
+        <td width="80%"><input @bind-value="@apiKey" style="width: 100%;" /></td>
+    </tr>
+    <tr>
+        <td><label>Consumption Url</label></td>
+        <td width="80%"><input @bind-value="@consumptionUrl" style="width: 100%;" /></td>
+    </tr>
+    <tr>
+        <td>Off Peak hours</td>
+        <td>
+            <select @bind="@offPeakStartHour">
+                <option value=0>00</option>
+                <option value=1>01</option>
+                <option value=2>02</option>
+                <option value=3>03</option>
+                <option value=4>04</option>
+                <option value=5>05</option>
+                <option value=6>06</option>
+                <option value=7>07</option>
+                <option value=8>08</option>
+                <option value=9>09</option>
+                <option value=10>10</option>
+                <option value=11>11</option>
+                <option value=12>12</option>
+                <option value=13>13</option>
+                <option value=14>14</option>
+                <option value=15>15</option>
+                <option value=16>16</option>
+                <option value=17>17</option>
+                <option value=18>18</option>
+                <option value=19>19</option>
+                <option value=20>20</option>
+                <option value=21>21</option>
+                <option value=22>22</option>
+                <option value=23>23</option>
+            </select>
+            <select @bind="@offPeakStartMinute">
+                <option value=0>00</option>
+                <option value=30>30</option>
+            </select>
+            to
+            <select @bind="@offPeakEndHour">
+                <option value=0>00</option>
+                <option value=1>01</option>
+                <option value=2>02</option>
+                <option value=3>03</option>
+                <option value=4>04</option>
+                <option value=5>05</option>
+                <option value=6>06</option>
+                <option value=7>07</option>
+                <option value=8>08</option>
+                <option value=9>09</option>
+                <option value=10>10</option>
+                <option value=11>11</option>
+                <option value=12>12</option>
+                <option value=13>13</option>
+                <option value=14>14</option>
+                <option value=15>15</option>
+                <option value=16>16</option>
+                <option value=17>17</option>
+                <option value=18>18</option>
+                <option value=19>19</option>
+                <option value=20>20</option>
+                <option value=21>21</option>
+                <option value=22>22</option>
+                <option value=23>23</option>
+            </select>
+            <select @bind="@offPeakEndMinute">
+                <option value=0>00</option>
+                <option value=30>30</option>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <button type="submit" @onclick="@GetConsumptionData">Process usage data</button>
+        </td>
+    </tr>
+</table>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+<hr />
 
-<Counter />
+@if (dailyConsumptions.Count > 0)
+{
+    <LineChart Values="@dailyOffPeakValues" Min="0" Max="100" />
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Peak. (kWh)</th>
+                <th>Off Peak. (kWh)</th>
+                <th>Total (kWh)</th>
+                <th>Off Peak %</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var consumption in dailyConsumptions)
+            {
+                <tr>
+                    <td>@consumption.Date.ToShortDateString()</td>
+                    <td>@consumption.PeakDisplay</td>
+                    <td>@consumption.OffPeakDisplay</td>
+                    <td>@consumption.TotalDisplay</td>
+                    <td>@consumption.OffPeakPercentDisplay</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private string apiKey = "";
+
+    private string consumptionUrl = "";
+
+    private int offPeakStartHour { get; set; }
+    private int offPeakStartMinute { get; set; }
+    private int offPeakEndHour { get; set; }
+    private int offPeakEndMinute { get; set; }
+
+    private TimeSpan offPeakStart = new TimeSpan();
+    private TimeSpan offPeakEnd = new TimeSpan();
+
+    private List<DailyConsumption> dailyConsumptions = new List<DailyConsumption>();
+    private List<double> dailyOffPeakValues = new List<double>();
+
+    private async void GetConsumptionData(MouseEventArgs mouseEventArgs)
+    {
+        if (String.IsNullOrWhiteSpace(apiKey))
+        {
+            return;
+        }
+
+        if (String.IsNullOrWhiteSpace(consumptionUrl))
+        {
+            return;
+        }
+
+        offPeakStart = new TimeSpan(offPeakStartHour, offPeakStartMinute, 0);
+        offPeakEnd = new TimeSpan(offPeakEndHour, offPeakEndMinute, 0);
+
+        var dataManager = new DataManager();
+        var data = await dataManager.FetchDailyUsageData(consumptionUrl, apiKey, 30, offPeakStart, offPeakEnd);
+
+        dailyConsumptions.AddRange(data);
+
+        dailyConsumptions.ForEach(consumption => dailyOffPeakValues.Add(consumption.OffPeakPercentage));
+
+        // do something
+        await InvokeAsync(() =>
+        {
+            StateHasChanged();
+        });
+    }
+}

@@ -37,10 +37,15 @@ namespace Octopus_OffPeak_Calc
 
             var dataManager = new DataManager();
 
-            var consumptions = await dataManager.FetchUsageData(
-                url, 
-                apiKey, 
-                durationInDays, 
+            var dailyConsumptions = await dataManager.FetchDailyUsageData(url, apiKey, 30, offPeakStart, offPeakEnd);
+
+            foreach (var consumption in dailyConsumptions)
+            {
+                Console.WriteLine(consumption.ToString());
+            }
+
+            var consumptions = dataManager.FetchUsageData(
+                dailyConsumptions,
                 currentPeakRate, 
                 currentOffPeakRate, 
                 newPeakRate, 

@@ -5,4 +5,17 @@
     <RootNamespace>Octo_Blazor</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'Octo-Blazor' " />
+  <ItemGroup>
+    <ProjectReference Include="..\Octopus-SmartData\Octopus-SmartData.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="BlazorTimePicker" />
+    <None Remove="NodaTimePicker" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="BlazorTimePicker" Version="1.2.0" />
+  </ItemGroup>
 </Project>

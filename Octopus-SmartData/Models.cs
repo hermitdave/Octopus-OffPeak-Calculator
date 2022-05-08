@@ -18,6 +18,67 @@ namespace Octopus_SmartData
         public DateTime interval_end { get; set; }
     }
 
+    public class DailyConsumption
+    {
+        public DateTime Date { get; set; }
+        public double Peak { get; set; }
+        public double OffPeak { get; set; }
+
+        public double OffPeakPercentage
+        {
+            get
+            {
+                return OffPeak * 100 / Total;
+            }
+        }
+
+        public String OffPeakPercentDisplay
+        {
+            get
+            {
+                return OffPeakPercentage.ToString("N0");
+            }
+        }
+
+        public double Total
+        {
+            get
+            {
+                return Peak + OffPeak;
+            }
+        }
+
+        public override string ToString()
+        {
+
+            return String.Format("Date: {0}, Peak: {1:0.00}kWh, Off Peak: {2:0.00}", Date, Peak, OffPeak);
+        }
+
+        public string PeakDisplay
+        {
+            get
+            {
+                return String.Format("{0:0.00}", Peak);
+            }
+        }
+
+        public string OffPeakDisplay
+        {
+            get
+            {
+                return String.Format("{0:0.00}", OffPeak);
+            }
+        }
+
+        public string TotalDisplay
+        {
+            get
+            {
+                return String.Format("{0:0.00}", Total);
+            }
+        }
+    }
+
     public class ConsumptionInfo
     {
         public string Title { get; set; }
