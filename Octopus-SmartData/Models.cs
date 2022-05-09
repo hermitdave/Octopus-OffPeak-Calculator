@@ -77,6 +77,45 @@ namespace Octopus_SmartData
                 return String.Format("{0:0.00}", Total);
             }
         }
+
+        public PartConsumption PeakConsumption
+        {
+            get
+            {
+                return GetPartConsumption(this.Peak);
+            }
+        }
+
+
+        public PartConsumption OffPeakConsumption
+        {
+            get
+            {
+                return GetPartConsumption(this.OffPeak);
+            }
+        }
+
+        private PartConsumption GetPartConsumption(double value)
+        {
+            return new PartConsumption
+            {
+                Date = this.Date,
+                Consumption = value
+            };
+        }
+    }
+
+    public class PartConsumption
+    {
+        public DateTime Date { get; set; }
+        public double Consumption {get; set;}
+        public string DisplayValue
+        {
+            get
+            {
+                return Consumption.ToString("N2");
+            }
+        }
     }
 
     public class ConsumptionInfo

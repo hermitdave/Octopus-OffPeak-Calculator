@@ -90,7 +90,17 @@
 
 @if (dailyConsumptions.Count > 0)
 {
-    <LineChart Values="@dailyOffPeakValues" Min="0" Max="100" />
+    <RadzenChart>
+        <RadzenAreaSeries Smooth="true" Data="@peakConsumptions" CategoryProperty="Date" Title="Peak" ValueProperty="Consumption" RenderingOrder="1">
+        </RadzenAreaSeries>
+        <RadzenAreaSeries Smooth="true" Data="@offPeakConsumptions" CategoryProperty="Date" Title="Off Peak" ValueProperty="Consumption">
+        </RadzenAreaSeries>
+        <RadzenCategoryAxis Padding="20" FormatString="{0:dd-MM}" />
+        <RadzenValueAxis Formatter="@FormatConsumption">
+            <RadzenGridLines Visible="true" />
+            <RadzenAxisTitle Text="Usage in kWh" />
+        </RadzenValueAxis>
+    </RadzenChart>
 
     <table class="table">
         <thead>
@@ -131,7 +141,14 @@
     private TimeSpan offPeakEnd = new TimeSpan();
 
     private List<DailyConsumption> dailyConsumptions = new List<DailyConsumption>();
-    private List<double> dailyOffPeakValues = new List<double>();
+    
+    private List<PartConsumption> peakConsumptions = new List<PartConsumption>();
+    private List<PartConsumption> offPeakConsumptions = new List<PartConsumption>();
+
+    string FormatConsumption(object value)
+    {
+        return ((double)value).ToString("N0");
+    }
 
     private async void GetConsumptionData(MouseEventArgs mouseEventArgs)
     {
@@ -153,7 +170,12 @@
 
         dailyConsumptions.AddRange(data);
 
-        dailyConsumptions.ForEach(consumption => dailyOffPeakValues.Add(consumption.OffPeakPercentage));
+        dailyConsumptions.ForEach(consumption =>
+        {
+            //dailyOffPeakValues.Add(consumption.OffPeakPercentage)
+            peakConsumptions.Add(consumption.PeakConsumption);
+            offPeakConsumptions.Add(consumption.OffPeakConsumption);
+        });
 
         // do something
         await InvokeAsync(() =>

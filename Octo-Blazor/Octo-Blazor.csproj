@@ -14,8 +14,9 @@
   <ItemGroup>
     <None Remove="BlazorTimePicker" />
     <None Remove="NodaTimePicker" />
+    <None Remove="Radzen.Blazor" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="BlazorTimePicker" Version="1.2.0" />
+    <PackageReference Include="Radzen.Blazor" Version="3.18.7" />
   </ItemGroup>
 </Project>
