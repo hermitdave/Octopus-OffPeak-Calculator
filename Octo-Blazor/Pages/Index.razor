@@ -2,6 +2,7 @@
 <h1>Hello, welcome to Octopus Energy Off Peak calculator. You will need API key and consumption url from Octopus account</h1>
 
 @using Octopus_SmartData
+@using Radzen
 @inject DataManager DataManager
 
 <table width="80%">
@@ -88,7 +89,14 @@
 
 <hr />
 
-@if (dailyConsumptions.Count > 0)
+@if (dailyConsumptions.Count == 0)
+{
+    @if (fetching)
+    { 
+        <RadzenProgressBar Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+    }
+}
+else
 {
     <RadzenChart>
         <RadzenAreaSeries Smooth="true" Data="@peakConsumptions" CategoryProperty="Date" Title="Peak" ValueProperty="Consumption" RenderingOrder="1">
@@ -130,6 +138,8 @@
 @code {
     private string apiKey = "";
 
+    private bool fetching = false;
+
     private string consumptionUrl = "";
 
     private int offPeakStartHour { get; set; }
@@ -141,7 +151,7 @@
     private TimeSpan offPeakEnd = new TimeSpan();
 
     private List<DailyConsumption> dailyConsumptions = new List<DailyConsumption>();
-    
+
     private List<PartConsumption> peakConsumptions = new List<PartConsumption>();
     private List<PartConsumption> offPeakConsumptions = new List<PartConsumption>();
 
@@ -162,11 +172,25 @@
             return;
         }
 
+        fetching = true;
+
+        dailyConsumptions.Clear();
+        peakConsumptions.Clear();
+        offPeakConsumptions.Clear();
+
+        // do something
+        await InvokeAsync(() =>
+        {
+            StateHasChanged();
+        });
+
         offPeakStart = new TimeSpan(offPeakStartHour, offPeakStartMinute, 0);
         offPeakEnd = new TimeSpan(offPeakEndHour, offPeakEndMinute, 0);
 
         var dataManager = new DataManager();
         var data = await dataManager.FetchDailyUsageData(consumptionUrl, apiKey, 30, offPeakStart, offPeakEnd);
+
+        fetching = false;
 
         dailyConsumptions.AddRange(data);
 

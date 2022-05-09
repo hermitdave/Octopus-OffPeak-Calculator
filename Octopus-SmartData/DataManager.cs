@@ -83,6 +83,11 @@ namespace Octopus_SmartData
                         break;
                     }
 
+                    if (entry.interval_start.Date > yesterday)
+                    {
+                        continue;
+                    }
+
                     var date = entry.interval_start.Date;
                     var timeOfDay = entry.interval_start.TimeOfDay;
 
