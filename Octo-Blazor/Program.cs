@@ -21,6 +21,7 @@ namespace Octo_Blazor
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+               
                 });
     }
 }

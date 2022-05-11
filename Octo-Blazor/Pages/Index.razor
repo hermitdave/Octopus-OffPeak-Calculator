@@ -3,7 +3,10 @@
 
 @using Octopus_SmartData
 @using Radzen
+@using System.Text
 @inject DataManager DataManager
+@inject IJSRuntime JSRuntime
+
 
 <table width="80%">
     <tr>
@@ -81,6 +84,17 @@
         </td>
     </tr>
     <tr>
+        <td><label>Report duration</label></td>
+        <td width="80%">
+            <select @bind="@duration">
+                <option value=30>30</option>
+                <option value=60>60</option>
+                <option value=90>90</option>
+                <option value=120>120</option>
+            </select>
+        </td>
+    </tr>
+    <tr>
         <td colspan="2">
             <button type="submit" @onclick="@GetConsumptionData">Process usage data</button>
         </td>
@@ -92,18 +106,22 @@
 @if (dailyConsumptions.Count == 0)
 {
     @if (fetching)
-    { 
+    {
         <RadzenProgressBar Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
     }
 }
 else
 {
+    <button @onclick="DownloadBinaryOptim">
+        Download processed data as CSV
+    </button>
+
     <RadzenChart>
-        <RadzenAreaSeries Smooth="true" Data="@peakConsumptions" CategoryProperty="Date" Title="Peak" ValueProperty="Consumption" RenderingOrder="1">
+        <RadzenAreaSeries Smooth="true" Data="@dailyConsumptions" CategoryProperty="Date" Title="Total" ValueProperty="Total">
         </RadzenAreaSeries>
         <RadzenAreaSeries Smooth="true" Data="@offPeakConsumptions" CategoryProperty="Date" Title="Off Peak" ValueProperty="Consumption">
         </RadzenAreaSeries>
-        <RadzenCategoryAxis Padding="20" FormatString="{0:dd-MM}" />
+        <RadzenCategoryAxis Padding="20" FormatString="{0:dd MMM}" />
         <RadzenValueAxis Formatter="@FormatConsumption">
             <RadzenGridLines Visible="true" />
             <RadzenAxisTitle Text="Usage in kWh" />
@@ -124,7 +142,7 @@ else
             @foreach (var consumption in dailyConsumptions)
             {
                 <tr>
-                    <td>@consumption.Date.ToShortDateString()</td>
+                    <td>@consumption.Date.ToString("dd MMM")</td>
                     <td>@consumption.PeakDisplay</td>
                     <td>@consumption.OffPeakDisplay</td>
                     <td>@consumption.TotalDisplay</td>
@@ -136,12 +154,11 @@ else
 }
 
 @code {
-    private string apiKey = "";
-
     private bool fetching = false;
 
+    private string apiKey = "";
     private string consumptionUrl = "";
-
+    private int duration = 30;
     private int offPeakStartHour { get; set; }
     private int offPeakStartMinute { get; set; }
     private int offPeakEndHour { get; set; }
@@ -188,7 +205,7 @@ else
         offPeakEnd = new TimeSpan(offPeakEndHour, offPeakEndMinute, 0);
 
         var dataManager = new DataManager();
-        var data = await dataManager.FetchDailyUsageData(consumptionUrl, apiKey, 30, offPeakStart, offPeakEnd);
+        var data = await dataManager.FetchDailyUsageData(consumptionUrl, apiKey, duration, offPeakStart, offPeakEnd);
 
         fetching = false;
 
@@ -206,5 +223,32 @@ else
         {
             StateHasChanged();
         });
+    }
+
+    async void DownloadBinaryOptim()
+    {
+        StringBuilder sb = new StringBuilder();
+
+        sb.AppendLine("Date, Peak, OffPeak");
+        foreach(var consumption in dailyConsumptions)
+        {
+            sb.AppendLine($"{consumption.Date.ToString("dd MMM yyyy")}, {consumption.PeakDisplay}, {consumption.OffPeakDisplay}");
+        }
+
+        var file = Encoding.ASCII.GetBytes(sb.ToString());
+
+        string fileName = $"ElectricityConsumption-{duration}-days.csv";
+        string contentType = "application/octet-stream";
+
+        // Check if the IJSRuntime is the WebAssembly implementation of the JSRuntime
+        if (JSRuntime is IJSUnmarshalledRuntime webAssemblyJSRuntime)
+        {
+            webAssemblyJSRuntime.InvokeUnmarshalled<string, string, byte[], bool>("BlazorDownloadFileFast", fileName, contentType, file);
+        }
+        else
+        {
+            // Fall back to the slow method if not in WebAssembly
+            await JSRuntime.InvokeVoidAsync("BlazorDownloadFile", fileName, contentType, file);
+        }
     }
 }

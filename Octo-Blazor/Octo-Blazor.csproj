@@ -15,8 +15,22 @@
     <None Remove="BlazorTimePicker" />
     <None Remove="NodaTimePicker" />
     <None Remove="Radzen.Blazor" />
+    <None Remove="Blazored.SessionStorage" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Radzen.Blazor" Version="3.18.7" />
+    <PackageReference Include="Blazored.SessionStorage" Version="2.2.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="wwwroot\script\" />
+    <Content Remove="wwwroot\script\FileDownload.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="wwwroot\script\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="wwwroot\script\FileDownload.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>
