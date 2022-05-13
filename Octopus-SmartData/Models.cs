@@ -103,6 +103,26 @@ namespace Octopus_SmartData
                 Consumption = value
             };
         }
+
+        public string CurrentCost(double peakRate, double offPeakRate)
+        {
+            return GetCostInfo(Peak, OffPeak, peakRate, offPeakRate);
+        }
+
+        public string NewCost(double peakRate, double offPeakRate)
+        {
+            return GetCostInfo(Peak, OffPeak, peakRate, offPeakRate);
+        }
+
+        public string GetCostInfo(double peakUsage, double offPeakUsage, double peakRate, double offPeakRate)
+        {
+            var peakCost = peakUsage * peakRate;
+            var offPeakCost = offPeakUsage * offPeakRate;
+
+            var cost = peakCost + offPeakCost;
+
+            return $"{peakCost.ToString("N2")} + {offPeakCost.ToString("N2")} = {cost.ToString("N2")}";
+        }
     }
 
     public class PartConsumption
