@@ -15,8 +15,8 @@ namespace Octopus_OffPeak_Calc
     {
         static async Task Main(string[] args)
         {
-            string url = "https://api.octopus.energy/v1/electricity-meter-points/1013040206969/meters/21L3824437/consumption/";
-            string apiKey = "sk_live_hHxfb4AG03X9SENp7oT8fWSy";
+            string url = "";
+            string apiKey = "";
 
             if (string.IsNullOrEmpty(url) || string.IsNullOrEmpty(apiKey))
             {
